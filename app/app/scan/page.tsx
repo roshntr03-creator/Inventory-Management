@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, CameraOff, Type, Scan, Upload, Image as ImageIcon, CheckCircle2, XCircle } from 'lucide-react';
+import { Camera, CameraOff, Type, Scan, Upload, Image as ImageIcon, CircleCheck as CheckCircle2, Circle as XCircle } from 'lucide-react';
 import { parseQRData } from '@/lib/qr-utils';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n-context';
