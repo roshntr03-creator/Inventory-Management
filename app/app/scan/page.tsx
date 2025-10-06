@@ -25,6 +25,10 @@ export default function ScanPage() {
 
   const startCamera = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
@@ -44,9 +48,22 @@ export default function ScanPage() {
           requestAnimationFrame(tick);
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Camera error:', error);
-      toast.error(t('scan.cameraError') || 'Camera access denied. Please use manual entry.');
+
+      let errorMessage = t('scan.cameraError') || 'Camera access denied';
+
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = t('scan.permissionDenied') || 'Camera permission denied. Please allow camera access in your browser settings.';
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage = t('scan.noCamera') || 'No camera found on this device.';
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        errorMessage = t('scan.cameraInUse') || 'Camera is already in use by another application.';
+      } else if (error.name === 'NotSupportedError' || error.message === 'Camera not supported') {
+        errorMessage = t('scan.notSupported') || 'Camera is not supported. For mobile devices, please use HTTPS connection.';
+      }
+
+      toast.error(errorMessage);
       setScanStatus('error');
     }
   };
@@ -133,18 +150,39 @@ export default function ScanPage() {
     };
   }, []);
 
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const cameraSupported = isHttps || isLocalhost;
+
   return (
-    <div className="min-h-screen bg-black p-4 sm:p-8" dir={dir}>
+    <div className="min-h-screen bg-black p-4 sm:p-6" dir={dir}>
       <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-2">
-            <Scan className="h-8 w-8 text-cyan-400" />
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+            <Scan className="h-6 w-6 sm:h-8 sm:w-8 text-cyan-400" />
             {t('scan.title') || 'QR Scanner'}
           </h1>
-          <p className="text-gray-400 text-sm sm:text-base">
+          <p className="text-gray-400 text-xs sm:text-base">
             {t('scan.description') || 'Scan QR codes to access items and stock lots'}
           </p>
         </div>
+
+        {!cameraSupported && (
+          <Card className="bg-yellow-500/10 border-yellow-500/50 mb-4">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">⚠️</div>
+                <div className="text-sm text-yellow-200">
+                  <p className="font-semibold mb-1">HTTPS Required for Camera</p>
+                  <p className="text-xs text-yellow-300/80">
+                    Camera access requires a secure HTTPS connection on mobile devices.
+                    Please use the Manual Entry option below to enter QR codes.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="bg-gray-900 border-gray-800 mb-4">
           <CardHeader>
@@ -213,7 +251,8 @@ export default function ScanPage() {
                 {!scanning ? (
                   <Button
                     onClick={startCamera}
-                    className="flex-1 bg-cyan-400 text-black hover:bg-cyan-500 h-12 text-base"
+                    disabled={!cameraSupported}
+                    className="flex-1 bg-cyan-400 text-black hover:bg-cyan-500 h-12 text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Camera className={`h-5 w-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                     {t('scan.startCamera') || 'Start Camera'}
@@ -229,6 +268,12 @@ export default function ScanPage() {
                   </Button>
                 )}
               </div>
+
+              {!cameraSupported && (
+                <div className="text-xs text-yellow-400 text-center">
+                  Camera disabled - HTTPS required
+                </div>
+              )}
 
               <div className="bg-gray-800/50 rounded-lg p-4">
                 <div className="flex items-start gap-3">
