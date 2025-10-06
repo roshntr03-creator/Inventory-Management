@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { generateQRCode } from '@/lib/qr-utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Download, Printer } from 'lucide-react';
+import { ArrowLeft, Download, Printer, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Item = {
@@ -93,6 +93,12 @@ export default function QRGeneratorPage() {
       printWindow.document.close();
       printWindow.print();
     }
+  };
+
+  const copyQRData = (type: 'item' | 'lot', id: string) => {
+    const data = JSON.stringify({ type, id });
+    navigator.clipboard.writeText(data);
+    toast.success('QR data copied! Paste in Scanner → Manual Entry');
   };
 
   const printAllLabels = () => {
@@ -192,7 +198,7 @@ export default function QRGeneratorPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
               <p className="text-gray-400 mb-4">SKU: {item.sku}</p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Button onClick={() => downloadQR(itemQR, `${item.sku}-item.png`)}>
                   <Download className="mr-2 h-4 w-4" />
                   Download
@@ -200,6 +206,10 @@ export default function QRGeneratorPage() {
                 <Button variant="outline" onClick={() => printQR(itemQR)}>
                   <Printer className="mr-2 h-4 w-4" />
                   Print
+                </Button>
+                <Button variant="outline" onClick={() => copyQRData('item', item.id)} className="border-cyan-400 text-cyan-400">
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy Data
                 </Button>
               </div>
             </div>
@@ -227,7 +237,7 @@ export default function QRGeneratorPage() {
                         Expires: {new Date(lot.expiry_date).toLocaleDateString()}
                       </p>
                     )}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button
                         size="sm"
                         onClick={() => downloadQR(lotQRs[lot.id], `${item.sku}-lot-${lot.lot_number}.png`)}
@@ -238,6 +248,10 @@ export default function QRGeneratorPage() {
                       <Button size="sm" variant="outline" onClick={() => printQR(lotQRs[lot.id])}>
                         <Printer className="mr-1 h-3 w-3" />
                         Print
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => copyQRData('lot', lot.id)} className="border-cyan-400 text-cyan-400">
+                        <Copy className="mr-1 h-3 w-3" />
+                        Copy
                       </Button>
                     </div>
                   </div>

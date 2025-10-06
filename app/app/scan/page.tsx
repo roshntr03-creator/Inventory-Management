@@ -113,6 +113,45 @@ export default function ScanPage() {
     setScanStatus('idle');
   };
 
+  const enhanceImageContrast = (imageData: ImageData, factor: number): ImageData => {
+    const data = imageData.data;
+    const enhanced = new ImageData(imageData.width, imageData.height);
+
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      const adjusted = ((gray / 255 - 0.5) * factor + 0.5) * 255;
+      const clamped = Math.max(0, Math.min(255, adjusted));
+
+      enhanced.data[i] = clamped;
+      enhanced.data[i + 1] = clamped;
+      enhanced.data[i + 2] = clamped;
+      enhanced.data[i + 3] = 255;
+    }
+
+    return enhanced;
+  };
+
+  const tryMultipleScanAttempts = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
+    const attempts = [
+      { imageData: context.getImageData(0, 0, canvas.width, canvas.height), label: 'original' },
+      { imageData: enhanceImageContrast(context.getImageData(0, 0, canvas.width, canvas.height), 2), label: 'enhanced contrast' },
+      { imageData: enhanceImageContrast(context.getImageData(0, 0, canvas.width, canvas.height), 3), label: 'high contrast' },
+    ];
+
+    for (const attempt of attempts) {
+      const code = jsQR(attempt.imageData.data, attempt.imageData.width, attempt.imageData.height, {
+        inversionAttempts: 'attemptBoth',
+      });
+
+      if (code && code.data) {
+        console.log(`QR code found with ${attempt.label}`);
+        return code;
+      }
+    }
+
+    return null;
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -141,17 +180,14 @@ export default function ScanPage() {
 
         setUploadedImage(event.target?.result as string);
 
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: 'attemptBoth',
-        });
+        const code = tryMultipleScanAttempts(canvas, context);
 
         if (code && code.data) {
           setScanStatus('success');
           processQRData(code.data);
         } else {
           setScanStatus('error');
-          toast.error('No QR code found in image. Please try another image or use Manual Entry.');
+          toast.error('No QR code found in image. Please try: 1) Take a clearer photo, 2) Ensure good lighting, 3) Use Manual Entry below.');
         }
       };
       img.src = event.target?.result as string;
