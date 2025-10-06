@@ -116,6 +116,26 @@ const translations: Record<Locale, Record<string, string>> = {
     'items.cancel': 'Cancel',
     'items.addNewItem': 'Add New Item',
 
+    // Scan
+    'scan.title': 'QR Scanner',
+    'scan.description': 'Scan QR codes to access items and stock lots',
+    'scan.camera': 'Camera Scanner',
+    'scan.manual': 'Manual Entry',
+    'scan.startCamera': 'Start Camera',
+    'scan.stopCamera': 'Stop Camera',
+    'scan.scanning': 'Scanning...',
+    'scan.cameraInactive': 'Camera not active',
+    'scan.tapToStart': 'Tap the button below to start',
+    'scan.cameraError': 'Camera access denied. Please use manual entry.',
+    'scan.invalidQR': 'Invalid QR code data',
+    'scan.success': 'QR code scanned successfully',
+    'scan.enterData': 'Enter QR Data',
+    'scan.process': 'Process QR Data',
+    'scan.formatLabel': 'Format:',
+    'scan.tip1': 'Allow camera access when prompted',
+    'scan.tip2': 'Hold the QR code steady in the frame',
+    'scan.tip3': 'Ensure good lighting for best results',
+
     // Common
     'common.loading': 'Loading...',
     'common.save': 'Save',
@@ -235,6 +255,26 @@ const translations: Record<Locale, Record<string, string>> = {
     'items.noItems': 'لا توجد مواد. أنشئ أول مادة للبدء.',
     'items.cancel': 'إلغاء',
     'items.addNewItem': 'إضافة مادة جديدة',
+
+    // Scan
+    'scan.title': 'ماسح QR',
+    'scan.description': 'امسح رموز QR للوصول إلى المواد واللوتات',
+    'scan.camera': 'ماسح الكاميرا',
+    'scan.manual': 'إدخال يدوي',
+    'scan.startCamera': 'تشغيل الكاميرا',
+    'scan.stopCamera': 'إيقاف الكاميرا',
+    'scan.scanning': 'جاري المسح...',
+    'scan.cameraInactive': 'الكاميرا غير نشطة',
+    'scan.tapToStart': 'اضغط على الزر أدناه للبدء',
+    'scan.cameraError': 'تم رفض الوصول للكاميرا. استخدم الإدخال اليدوي.',
+    'scan.invalidQR': 'بيانات QR غير صحيحة',
+    'scan.success': 'تم مسح رمز QR بنجاح',
+    'scan.enterData': 'أدخل بيانات QR',
+    'scan.process': 'معالجة بيانات QR',
+    'scan.formatLabel': 'الصيغة:',
+    'scan.tip1': 'اسمح بالوصول للكاميرا عند الطلب',
+    'scan.tip2': 'أمسك رمز QR ثابتاً في الإطار',
+    'scan.tip3': 'تأكد من الإضاءة الجيدة للحصول على أفضل النتائج',
 
     // Common
     'common.loading': 'جاري التحميل...',
